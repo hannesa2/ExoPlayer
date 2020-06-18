@@ -1197,6 +1197,9 @@ public final class DefaultAudioSink implements AudioSink {
     AudioTrack audioTrack;
     if (Util.SDK_INT >= 21) {
       audioTrack = createAudioTrackV21();
+      if (audioAttributes.device != null && Util.SDK_INT >= 23) {
+        audioTrack.setPreferredDevice(audioAttributes.device);
+      }
     } else {
       int streamType = Util.getStreamTypeForAudioUsage(audioAttributes.usage);
       if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) {

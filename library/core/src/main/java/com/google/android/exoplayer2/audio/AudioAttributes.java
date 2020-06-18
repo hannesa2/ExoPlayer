@@ -16,6 +16,8 @@
 package com.google.android.exoplayer2.audio;
 
 import android.annotation.TargetApi;
+import android.media.AudioDeviceInfo;
+import android.support.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 
 /**
@@ -44,6 +46,8 @@ public final class AudioAttributes {
     private int flags;
     @C.AudioUsage
     private int usage;
+    @Nullable
+    private AudioDeviceInfo playbackDevice;
 
     /**
      * Creates a new builder for {@link AudioAttributes}.
@@ -82,10 +86,19 @@ public final class AudioAttributes {
     }
 
     /**
+     * Sets the preferred audio output device. This setting will only be applied for API >= 23
+     * @param device The preferred audio output device
+     */
+    public Builder setPreferredDevice(AudioDeviceInfo device) {
+      this.playbackDevice = device;
+      return this;
+    }
+
+    /**
      * Creates an {@link AudioAttributes} instance from this builder.
      */
     public AudioAttributes build() {
-      return new AudioAttributes(contentType, flags, usage);
+      return new AudioAttributes(contentType, flags, usage, playbackDevice);
     }
 
   }
@@ -96,14 +109,17 @@ public final class AudioAttributes {
   public final int flags;
   @C.AudioUsage
   public final int usage;
+  @Nullable
+  public AudioDeviceInfo device;
 
   private android.media.AudioAttributes audioAttributesV21;
 
   private AudioAttributes(@C.AudioContentType int contentType, @C.AudioFlags int flags,
-      @C.AudioUsage int usage) {
+      @C.AudioUsage int usage, @Nullable AudioDeviceInfo device) {
     this.contentType = contentType;
     this.flags = flags;
     this.usage = usage;
+    this.device = device;
   }
 
   @TargetApi(21)
@@ -128,7 +144,7 @@ public final class AudioAttributes {
     }
     AudioAttributes other = (AudioAttributes) obj;
     return this.contentType == other.contentType && this.flags == other.flags
-        && this.usage == other.usage;
+        && this.usage == other.usage && this.device == other.device;
   }
 
   @Override
